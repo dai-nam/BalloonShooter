@@ -1,30 +1,47 @@
-let balls;
-let player;
-let bombs;
-let ballSpawnTime;
-let bombSpawnTime;
-let bomb;
+
+//Game Variables
 let audioManager;
-
-//todo: millis() implementdiscieren statt timer
-let ballTimer = 0;
-let bombTimer = 0;
-
-let maxBalls = 32;
-let maxBombs = 1;
-
+let gameStarted = false;
 let score = 0;
 let level = 0;
-let immuneTime = 2.5;
-//set to a value higher than immuneTime to avoid flashing at startup (hacky solution)
-let timeSinceLastHit = immuneTime * 60 + 1;
+let newLevelSet = false;
 
-let explosionAnimation;
+
+//Game Object Variables
+let player;
+let immuneTime = 2.5;
+let timeSinceLastHit = immuneTime * 60 + 1; //set to a value higher than immuneTime to avoid flashing at startup (hacky solution)
+
+let balls;
+let maxBalls = 32;
+let ballSpawnTime;
+let ballTimer = 0;  //todo: millis() implementdiscieren statt timer
 let ballDestroyedAnimations;
 
-let positionInLoop = 0;
-let gameSpeed = 300;  //ms between beats
-let bars = 8;
+let bomb;
+let bombs;
+let maxBombs = 1;
+let bombSpawnTime;
+let bombTimer = 0;
+let explosionAnimation;
+
+//Sequencer Variables
+let gameSpeed = 400;  //ms between beats
+
+let wholeNote = 8;
+let quarterNote = 4;
+let eigthNote = 2;
+
+let wholeNoteCount = 0;
+let quarterNoteCount = 0;
+let eigthNoteCount = 0;
+
+let prevWholeNoteCount;
+let prevQuarterNoteCount;
+let prevEigthNoteCount;
+
+
+//-------------- GAME CODE --------------------------------------------------------------------------
 
 function preload() {
   audioManager = new AudioManager();
@@ -41,16 +58,21 @@ function setup() {
   bombs = [];
 
   ballDestroyedAnimations = [];
-  logEverySecond();
-  globalTimer();
 }
 
 function draw() {
   background(220);
 
+  if(!gameStarted)
+  {
+    return;
+  }
+
+  /*
   if (readyToSpawnNewBall()) {
     spawnNewBall(random(width), random(height));
   }
+  */
 
   if (readyToSpawnNewBomb()) {
     spawnNewBomb(random(width), random(height));
@@ -80,11 +102,23 @@ function draw() {
   showTextBar();
 }
 
+function startGame()
+{
+  startAudio();
+  logEverySecond();
+  globalTimer();
+  gameStarted = true;
+}
+
 function mousePressed() {
+  if(!gameStarted)
+  {
+    startGame();
+  }
+
   for (let ball of balls) {
     ball.shoot();
   }
-  //spawnNewBall(mouseX, mouseY);
 }
 
 function spawnNewBall(x, y) {
@@ -124,8 +158,8 @@ function updateScore(amount) {
 
   level = Math.floor(score / 3);
 
-  if (oldLevel != level && ballSpawnTime >= 0.4) {
-    ballSpawnTime -= 0.1;
+  if (oldLevel != level) {
+   newLevelSet = true;
   }
 }
 
@@ -152,6 +186,7 @@ function showTextBar() {
   text("Health: " + player.health, width - 110, 40);
 }
 
+
 function waitForSeconds(seconds) {
   return new Promise((resolve) => setTimeout(resolve, seconds * 1000));
 }
@@ -163,15 +198,54 @@ async function logEverySecond() {
 }
 
 async function globalTimer() {
-  let prevPosition;
+
   while (true) {
-    prevPosition = positionInLoop;
-    positionInLoop= millis() % (gameSpeed * bars);
-    if(prevPosition > positionInLoop) //detect signal transition
-      {
-        console.log("Trigger Event");
-        
-      }
+    sendTriggers();  
     await waitForSeconds(0.01);
+  }
+}
+
+  function sendTriggers()
+  {
+    //todo: Bug, neues gamespeed immer auf neuem vollem beat triggern.
+    if(newLevelSet)
+    {
+      gameSpeed -= 10;
+      newLevelSet = false;
+    }   
+    wholeNoteTrigger();
+    quarterNotTrigger();
+    eigthNoteTrigger();
+  }
+
+  function wholeNoteTrigger()
+  {
+    prevWholeNoteCount = wholeNoteCount;
+    wholeNoteCount= millis() % (gameSpeed * wholeNote);
+    if(prevWholeNoteCount > wholeNoteCount) //detect signal transition
+    {
+            //console.log("Trigger Event");
+      spawnNewBall(random(width), random(height));
+      triggerKick();     
+    }
+  }
+
+  function quarterNotTrigger()
+{
+  prevQuarterNoteCount = quarterNoteCount;
+  quarterNoteCount= millis() % (gameSpeed * quarterNote);
+  if(prevQuarterNoteCount > quarterNoteCount)
+  {
+    triggerSnare();        
+  }
+}
+
+function eigthNoteTrigger()
+{
+  prevEigthNoteCount = eigthNoteCount;
+  eigthNoteCount= millis() % (gameSpeed * eigthNote);
+  if(prevEigthNoteCount > eigthNoteCount)
+  {
+    triggerHihat();        
   }
 }

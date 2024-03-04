@@ -9,10 +9,9 @@ class AudioManager{
     
     loadSounds()
     {
-      //unschön --> File IO
        for(let i = 1; i <= 8; i++)
         {
-          let click = loadSound(`assets/click/Click${i}.wav`);
+          let click = loadSound(`assets/click/click${i}.wav`);
           click.playMode('sustain')
           this.clickSounds.push(click);
           let burst = loadSound(`assets/burst/chimes${i}.wav`);
@@ -24,6 +23,9 @@ class AudioManager{
     
     playSound(sound)
     {
+      if(!sound)
+        return;
+
       if(!sound.isPlaying())
         {
             sound.play();
