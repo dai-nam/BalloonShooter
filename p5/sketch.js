@@ -3,8 +3,10 @@
 let audioManager;
 let gameStarted = false;
 let score = 0;
-let level = 0;
-let newLevelSet = false;
+let level;
+//let level = 0;
+//let newLevelSet = false;
+//let gameSpeed = 400;  //ms between beats
 
 
 //Game Object Variables
@@ -13,7 +15,7 @@ let immuneTime = 2.5;
 let timeSinceLastHit = immuneTime * 60 + 1; //set to a value higher than immuneTime to avoid flashing at startup (hacky solution)
 
 let balls;
-let maxBalls = 32;
+const maxBalls = 32;
 let ballSpawnTime;
 let ballTimer = 0;  //todo: millis() implementdiscieren statt timer
 let ballDestroyedAnimations;
@@ -26,11 +28,10 @@ let bombTimer = 0;
 let explosionAnimation;
 
 //Sequencer Variables
-let gameSpeed = 400;  //ms between beats
-
-let wholeNote = 8;
-let quarterNote = 4;
-let eigthNote = 2;
+let bpm;
+const wholeNote = 8;
+const quarterNote = 4;
+const eigthNote = 2;
 
 let wholeNoteCount = 0;
 let quarterNoteCount = 0;
@@ -40,6 +41,8 @@ let prevWholeNoteCount;
 let prevQuarterNoteCount;
 let prevEigthNoteCount;
 
+let currentMilli = 0;
+let prevMilli = 0;
 
 //-------------- GAME CODE --------------------------------------------------------------------------
 
@@ -51,6 +54,9 @@ function setup() {
   createCanvas(800, 800);
   //ballSpawnTime = 2.0;
   //bombSpawnTime = 9.0;
+  level = new Level(1);
+  bpm = level.speed;
+
   ballSpawnTime = 0.4;
   bombSpawnTime = 1.0;
   player = new Player();
@@ -154,13 +160,19 @@ function readyToSpawnNewBomb() {
 
 function updateScore(amount) {
   score += amount;
-  let oldLevel = level;
-
+  level.points += amount;
+  if(level.points >= level.pointsUntilNewLevel)
+  {
+    level.setNewLevel(level.value + 1);
+  }
+  /*
+  let oldLevel = level.value;
   level = Math.floor(score / 3);
 
-  if (oldLevel != level) {
+  if (oldLevel != level.value) {
    newLevelSet = true;
   }
+  */
 }
 
 function showAnimations() {
@@ -180,7 +192,7 @@ function endScreen() {}
 function showTextBar() {
   textSize(20);
   fill(0);
-  text("Level: " + level, width - 440, 40);
+  text("Level: " + level.value, width - 440, 40);
   text("Score: " + score, width - 220, 40);
   text("Balls: " + balls.length, width - 330, 40);
   text("Health: " + player.health, width - 110, 40);
@@ -208,44 +220,62 @@ async function globalTimer() {
   function sendTriggers()
   {
     //todo: Bug, neues gamespeed immer auf neuem vollem beat triggern.
-    if(newLevelSet)
-    {
-      gameSpeed -= 10;
-      newLevelSet = false;
-    }   
-    wholeNoteTrigger();
-    quarterNotTrigger();
+
+    currentMilli = millis();
+    quarterNoteTrigger();
     eigthNoteTrigger();
+    wholeNoteTrigger();
   }
 
   function wholeNoteTrigger()
   {
     prevWholeNoteCount = wholeNoteCount;
-    wholeNoteCount= millis() % (gameSpeed * wholeNote);
+    wholeNoteCount = (currentMilli - prevMilli) % (bpm * wholeNote);
     if(prevWholeNoteCount > wholeNoteCount) //detect signal transition
     {
             //console.log("Trigger Event");
       spawnNewBall(random(width), random(height));
-      triggerKick();     
+      triggerKick();  
+      updateBPM();
     }
   }
 
-  function quarterNotTrigger()
+  function quarterNoteTrigger()
 {
   prevQuarterNoteCount = quarterNoteCount;
-  quarterNoteCount= millis() % (gameSpeed * quarterNote);
+  quarterNoteCount = (currentMilli - prevMilli) % (bpm * quarterNote);
   if(prevQuarterNoteCount > quarterNoteCount)
   {
-    triggerSnare();        
+    triggerSnare();  
   }
 }
 
 function eigthNoteTrigger()
 {
   prevEigthNoteCount = eigthNoteCount;
-  eigthNoteCount= millis() % (gameSpeed * eigthNote);
+  eigthNoteCount = (currentMilli - prevMilli) % (bpm * eigthNote);
   if(prevEigthNoteCount > eigthNoteCount)
   {
     triggerHihat();        
   }
+}
+
+//Bug
+function updateBPM()
+{
+   if(level.updated)
+   {
+    prevMilli = millis();  
+     bpm = level.speed;
+     level.updated = false;
+     wholeNoteCount = 0;
+     quarterNoteCount = 0;
+     eigthNoteCount = 0;
+   }   
+
+   function beatMapping()
+   {
+    //1:
+    
+   }
 }

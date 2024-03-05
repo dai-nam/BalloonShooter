@@ -16,13 +16,11 @@ async function loadRnbo( ){
   gainNode = context.createGain();
   gainNode.connect(device.node);
   device.node.connect(context.destination);
+  /*
   device.parameters.forEach(parameter => {
   console.log(parameter.id+": "+parameter.value);
   });
-
-
-
-
+  */
 };
 
 loadRnbo();
