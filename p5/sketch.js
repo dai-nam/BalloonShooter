@@ -1,6 +1,7 @@
 
 //Game Variables
 let audioManager;
+let drums;
 let gameStarted = false;
 let score = 0;
 let level;
@@ -27,22 +28,7 @@ let bombSpawnTime;
 let bombTimer = 0;
 let explosionAnimation;
 
-//Sequencer Variables
-let bpm;
-const wholeNote = 8;
-const quarterNote = 4;
-const eigthNote = 2;
 
-let wholeNoteCount = 0;
-let quarterNoteCount = 0;
-let eigthNoteCount = 0;
-
-let prevWholeNoteCount;
-let prevQuarterNoteCount;
-let prevEigthNoteCount;
-
-let currentMilli = 0;
-let prevMilli = 0;
 
 //-------------- GAME CODE --------------------------------------------------------------------------
 
@@ -55,7 +41,6 @@ function setup() {
   //ballSpawnTime = 2.0;
   //bombSpawnTime = 9.0;
   level = new Level(1);
-  bpm = level.speed;
 
   ballSpawnTime = 0.4;
   bombSpawnTime = 1.0;
@@ -111,8 +96,8 @@ function draw() {
 function startGame()
 {
   startAudio();
+  drums = new DrumSequener(level);
   logEverySecond();
-  globalTimer();
   gameStarted = true;
 }
 
@@ -207,75 +192,4 @@ async function logEverySecond() {
   while (true) {
     await waitForSeconds(1.0);
   }
-}
-
-async function globalTimer() {
-
-  while (true) {
-    sendTriggers();  
-    await waitForSeconds(0.01);
-  }
-}
-
-  function sendTriggers()
-  {
-    //todo: Bug, neues gamespeed immer auf neuem vollem beat triggern.
-
-    currentMilli = millis();
-    quarterNoteTrigger();
-    eigthNoteTrigger();
-    wholeNoteTrigger();
-  }
-
-  function wholeNoteTrigger()
-  {
-    prevWholeNoteCount = wholeNoteCount;
-    wholeNoteCount = (currentMilli - prevMilli) % (bpm * wholeNote);
-    if(prevWholeNoteCount > wholeNoteCount) //detect signal transition
-    {
-            //console.log("Trigger Event");
-      spawnNewBall(random(width), random(height));
-      triggerKick();  
-      updateBPM();
-    }
-  }
-
-  function quarterNoteTrigger()
-{
-  prevQuarterNoteCount = quarterNoteCount;
-  quarterNoteCount = (currentMilli - prevMilli) % (bpm * quarterNote);
-  if(prevQuarterNoteCount > quarterNoteCount)
-  {
-    triggerSnare();  
-  }
-}
-
-function eigthNoteTrigger()
-{
-  prevEigthNoteCount = eigthNoteCount;
-  eigthNoteCount = (currentMilli - prevMilli) % (bpm * eigthNote);
-  if(prevEigthNoteCount > eigthNoteCount)
-  {
-    triggerHihat();        
-  }
-}
-
-//Bug
-function updateBPM()
-{
-   if(level.updated)
-   {
-    prevMilli = millis();  
-     bpm = level.speed;
-     level.updated = false;
-     wholeNoteCount = 0;
-     quarterNoteCount = 0;
-     eigthNoteCount = 0;
-   }   
-
-   function beatMapping()
-   {
-    //1:
-    
-   }
 }
