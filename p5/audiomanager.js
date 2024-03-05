@@ -28,7 +28,7 @@ class AudioManager{
 
       if(!sound.isPlaying())
         {
-           // sound.play();
+            sound.play();
         }
     }
   }

@@ -30,9 +30,9 @@ class ExplosionAnimation{
   }
   
     async triggerAnimation() {
-    while(this.size < 45){
+    while(this.size < 100){
       await this.waitForSeconds(0.01);
-      this.size += 1.5;
+      this.size += 2.8;
     }
       explosionAnimation = null;
   }

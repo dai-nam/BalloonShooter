@@ -1,7 +1,6 @@
 class DrumSequener{
 
 constructor(level){
-    //Sequencer Variables
 this.wholeNote = 8;
 this.quarterNote = 4;
 this.eigthNote = 2;
@@ -15,7 +14,7 @@ this.prevEigthNoteCount;
 this.currentMilli = 0;
 this.prevMilli = 0;
 
-this.bpm = level.speed;
+this.speedInMs = level.speed;
 this.level = level;
 
 this.globalTimer();
@@ -30,9 +29,7 @@ async globalTimer() {
   }
   
      sendTriggers()
-    {
-      //todo: Bug, neues gamespeed immer auf neuem vollem beat triggern.
-  
+    {  
       this.currentMilli = millis();
       this.quarterNoteTrigger();
       this.eigthNoteTrigger();
@@ -42,20 +39,19 @@ async globalTimer() {
      wholeNoteTrigger()
     {
         this.prevWholeNoteCount = this.wholeNoteCount;
-        this.wholeNoteCount = (this.currentMilli - this.prevMilli) % (this.bpm * this.wholeNote);
+        this.wholeNoteCount = (this.currentMilli - this.prevMilli) % (this.speedInMs * this.wholeNote);
       if(this.prevWholeNoteCount > this.wholeNoteCount) //detect signal transition
       {
-              //console.log("Trigger Event");
         spawnNewBall(random(width), random(height));
         triggerKick();  
-        this.updateBPM();
+        this.updateSpeed();
       }
     }
   
      quarterNoteTrigger()
   {
     this.prevQuarterNoteCount =this. quarterNoteCount;
-    this.quarterNoteCount = (this.currentMilli - this.prevMilli) % (this.bpm * this.quarterNote);
+    this.quarterNoteCount = (this.currentMilli - this.prevMilli) % (this.speedInMs * this.quarterNote);
     if(this.prevQuarterNoteCount > this.quarterNoteCount)
     {
       triggerSnare();  
@@ -65,30 +61,36 @@ async globalTimer() {
    eigthNoteTrigger()
   {
     this.prevEigthNoteCount = this.eigthNoteCount;
-    this.eigthNoteCount = (this.currentMilli - this.prevMilli) % (this.bpm * this.eigthNote);
+    this.eigthNoteCount = (this.currentMilli - this.prevMilli) % (this.speedInMs * this.eigthNote);
     if(this.prevEigthNoteCount > this.eigthNoteCount)
     {
-      triggerHihat();        
+     triggerHihat();        
     }
   }
   
-  //Bug
-   updateBPM()
+   updateSpeed()
   {
      if(level.updated)
      {
         this.prevMilli = millis();  
-       this.bpm = level.speed;
+       this.speedInMs = level.speed;
        level.updated = false;
        this.wholeNoteCount = 0;
        this.quarterNoteCount = 0;
        this.eigthNoteCount = 0;
+       console.log("Current BPM: " + this.getCurrentBPM());
      }   
+    }
   
-     function beatMapping()
+    
+    getCurrentBPM()
+    {
+       return Math.round(0.5 * (1000.0 / this.speedInMs) * 60.0);
+    }
+
+     beatMapping()
      {
       //1:
       
      }
-  }
-}
+    }

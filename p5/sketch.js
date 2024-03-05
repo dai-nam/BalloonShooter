@@ -5,10 +5,6 @@ let drums;
 let gameStarted = false;
 let score = 0;
 let level;
-//let level = 0;
-//let newLevelSet = false;
-//let gameSpeed = 400;  //ms between beats
-
 
 //Game Object Variables
 let player;
@@ -28,8 +24,6 @@ let bombSpawnTime;
 let bombTimer = 0;
 let explosionAnimation;
 
-
-
 //-------------- GAME CODE --------------------------------------------------------------------------
 
 function preload() {
@@ -38,8 +32,6 @@ function preload() {
 
 function setup() {
   createCanvas(800, 800);
-  //ballSpawnTime = 2.0;
-  //bombSpawnTime = 9.0;
   level = new Level(1);
 
   ballSpawnTime = 0.4;
@@ -59,11 +51,6 @@ function draw() {
     return;
   }
 
-  /*
-  if (readyToSpawnNewBall()) {
-    spawnNewBall(random(width), random(height));
-  }
-  */
 
   if (readyToSpawnNewBomb()) {
     spawnNewBomb(random(width), random(height));
@@ -150,14 +137,7 @@ function updateScore(amount) {
   {
     level.setNewLevel(level.value + 1);
   }
-  /*
-  let oldLevel = level.value;
-  level = Math.floor(score / 3);
 
-  if (oldLevel != level.value) {
-   newLevelSet = true;
-  }
-  */
 }
 
 function showAnimations() {
