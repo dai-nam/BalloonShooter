@@ -4,7 +4,7 @@ let audioManager;
 let drums;
 let gameStarted = false;
 let score = 0;
-let level;
+let gameState;
 
 //Game Object Variables
 let player;
@@ -13,15 +13,11 @@ let timeSinceLastHit = immuneTime * 60 + 1; //set to a value higher than immuneT
 
 let balls;
 const maxBalls = 32;
-let ballSpawnTime;
-let ballTimer = 0;  //todo: millis() implementdiscieren statt timer
 let ballDestroyedAnimations;
 
 let bomb;
 let bombs;
 let maxBombs = 1;
-let bombSpawnTime;
-let bombTimer = 0;
 let explosionAnimation;
 
 //-------------- GAME CODE --------------------------------------------------------------------------
@@ -32,10 +28,8 @@ function preload() {
 
 function setup() {
   createCanvas(800, 800);
-  level = new Level(1);
+  gameState = new GameState(1);
 
-  ballSpawnTime = 0.4;
-  bombSpawnTime = 1.0;
   player = new Player();
   balls = [];
   bombs = [];
@@ -49,11 +43,6 @@ function draw() {
   if(!gameStarted)
   {
     return;
-  }
-
-
-  if (readyToSpawnNewBomb()) {
-    spawnNewBomb(random(width), random(height));
   }
 
   player.updateImmuneStatus();
@@ -83,7 +72,7 @@ function draw() {
 function startGame()
 {
   startAudio();
-  drums = new DrumSequener(level);
+  drums = new DrumSequener(gameState);
   logEverySecond();
   gameStarted = true;
 }
@@ -111,33 +100,20 @@ function spawnNewBall(x, y) {
 
 function spawnNewBomb(x, y) {
   if (bombs.length >= maxBombs) return;
+  if(random(100) > gameState.bombProbabilty) return;
+  if(balls.length <= 1) return;
+
   bombs.push(new Bomb(x, y));
 }
 
-function readyToSpawnNewBall() {
-  if (ballTimer++ > ballSpawnTime * 60) {
-    ballTimer = 0;
-    return true;
-  }
-  return false;
-}
-
-function readyToSpawnNewBomb() {
-  if (bombTimer++ > bombSpawnTime * 60) {
-    bombTimer = 0;
-    return true;
-  }
-  return false;
-}
 
 function updateScore(amount) {
   score += amount;
-  level.points += amount;
-  if(level.points >= level.pointsUntilNewLevel)
+  gameState.points += amount;
+  if(gameState.points >= gameState.pointsUntilNewLevel)
   {
-    level.setNewLevel(level.value + 1);
+    gameState.setNewLevel(gameState.level + 1);
   }
-
 }
 
 function showAnimations() {
@@ -157,7 +133,7 @@ function endScreen() {}
 function showTextBar() {
   textSize(20);
   fill(0);
-  text("Level: " + level.value, width - 440, 40);
+  text("Level: " + gameState.level, width - 440, 40);
   text("Score: " + score, width - 220, 40);
   text("Balls: " + balls.length, width - 330, 40);
   text("Health: " + player.health, width - 110, 40);

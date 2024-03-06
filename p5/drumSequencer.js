@@ -43,6 +43,7 @@ async globalTimer() {
       if(this.prevWholeNoteCount > this.wholeNoteCount) //detect signal transition
       {
         spawnNewBall(random(width), random(height));
+        spawnNewBomb(random(width), random(height));
         triggerKick();  
         this.updateSpeed();
       }
@@ -70,11 +71,11 @@ async globalTimer() {
   
    updateSpeed()
   {
-     if(level.updated)
+     if(gameState.updated)
      {
         this.prevMilli = millis();  
-       this.speedInMs = level.speed;
-       level.updated = false;
+       this.speedInMs = gameState.speed;
+       gameState.updated = false;
        this.wholeNoteCount = 0;
        this.quarterNoteCount = 0;
        this.eigthNoteCount = 0;

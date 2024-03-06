@@ -1,25 +1,27 @@
-class Level{
+class GameState{
 
-    constructor(value)
+    constructor(level)
     {
-        this.value = value;
+        this.level = level;
         this.points = 0;
-        this.pointsUntilNewLevel = 2;
-        this.speed = 300;   //ms between beats
+        this.pointsUntilNewLevel = this.level;
+        this.speed = 350;   //ms between beats
         this.updated = false;
-        this.speedLoss = 10;
+        this.speedLoss = 4;
+        this.bombProbabilty = 100;
     }
 
-    setNewLevel(value)
+    setNewLevel(level)
     {
-        this.value = value;
+        this.level = level;
         this.points = 0;
-        //this.pointsUntilNewLevel = this.value * 2;
-        this.pointsUntilNewLevel = 1;
+        this.pointsUntilNewLevel = this.level * 2;
 
-        this.speed = 300 - this.value * this.speedLoss;   //ms between beats
-        this.speed = constrain(this.speed, 50, 300);
-
+        this.speed = 300 - this.level * this.speedLoss;
+        this.speed = constrain(this.speed, 80, 350);
+        this.bombProbabilty = 100 - this.level * 5;
+        this.bombProbabilty = constrain(this.bombProbabilty, 10, 100);  
+        //todo speed und probabl syncen, damit sie proportional zueinande sinken in gleich vielen steps
         this.updated = true;
     }
 }
