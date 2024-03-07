@@ -5,6 +5,7 @@ let drums;
 let gameStarted = false;
 let score = 0;
 let gameState;
+let backgroundColor;
 
 //Game Object Variables
 let player;
@@ -15,8 +16,7 @@ let balls;
 const maxBalls = 32;
 let ballDestroyedAnimations;
 
-let bomb;
-let bombs;
+var bomb = null;
 let maxBombs = 1;
 let explosionAnimation;
 
@@ -28,17 +28,17 @@ function preload() {
 
 function setup() {
   createCanvas(800, 800);
+  backgroundColor = getRandomColor(true);
   gameState = new GameState(1);
 
   player = new Player();
   balls = [];
-  bombs = [];
 
   ballDestroyedAnimations = [];
 }
 
 function draw() {
-  background(220);
+  background(backgroundColor);
 
   if(!gameStarted)
   {
@@ -58,7 +58,7 @@ function draw() {
     }
   }
 
-  for (let bomb of bombs) {
+  if(bomb) {
     bomb.display();
     if (player.hasCollidedBomb(bomb)) {
       player.handleBombCollision(bomb);
@@ -99,11 +99,11 @@ function spawnNewBall(x, y) {
 }
 
 function spawnNewBomb(x, y) {
-  if (bombs.length >= maxBombs) return;
+  if(bomb) return;
   if(random(100) > gameState.bombProbabilty) return;
   if(balls.length <= 1) return;
 
-  bombs.push(new Bomb(x, y));
+  bomb = new Bomb(x, y);
 }
 
 
@@ -148,4 +148,14 @@ async function logEverySecond() {
   while (true) {
     await waitForSeconds(1.0);
   }
+}
+
+function getRandomColor(alpha)
+{
+  if(!alpha)
+  {
+    return color(random(255), random(255), random(255));
+  }
+    return color(random(255), random(255), random(255), 20);
+
 }

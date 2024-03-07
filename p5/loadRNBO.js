@@ -6,31 +6,43 @@ let synthDevice;
 
 let gainNode;
 let audioStarted = false;
+let synthFrequency;
+let synthGain;
+
 
 async function loadRnbo( ){
 
   context = new AudioContext();
+  gainNode = context.createGain();
 
+  //Drums
   let drumsPatcher = await fetch("export/drums/drums.export.json");
   let patcher = await drumsPatcher.json();
   drumDevice = await RNBO.createDevice({ context, patcher });
 
+  gainNode.connect(drumDevice.node);
+  drumDevice.node.connect(context.destination);
+
+
+  //Synth
   let synthPatcher = await fetch("export/synth/synth.export.json");
   patcher = await synthPatcher.json();
   synthDevice = await RNBO.createDevice({ context, patcher });
-  
-  gainNode = context.createGain();
-  gainNode.connect(drumDevice.node);
-  drumDevice.node.connect(context.destination);
-  
+
   gainNode.connect(synthDevice.node);
   synthDevice.node.connect(context.destination);
+  synthFrequency = synthDevice.parametersById.get("synthfrequency");
+  synthFrequency.value = 120;
+  synthGain = synthDevice.parametersById.get("synthgain");
+  synthGain.value = 0.25;
 
   /*
-  device.parameters.forEach(parameter => {
-  console.log(parameter.id+": "+parameter.value);
-  });
-  */
+  synthDevice.parameters.forEach(parameter => {
+    console.log(parameter.id);
+   console.log(parameter.name);
+});
+*/
+
 };
 
 loadRnbo();
@@ -61,6 +73,11 @@ function triggerHihat()
   drumDevice.scheduleEvent(event1);
   const event2 = new RNBO.MessageEvent(RNBO.TimeNow, "in1", RNBO.bang);
   synthDevice.scheduleEvent(event2);
+}
+
+function updateSynth()
+{
+  synthFrequency.value *= Math.pow(1.0594633, 1.0/2.0);; //1/2 Semitone higher
 }
   
 

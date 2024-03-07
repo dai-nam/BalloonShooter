@@ -3,11 +3,19 @@ class Bomb {
       this.size = 50;
       this.x = constrain(x, this.size / 2, width - this.size / 2);
       this.y = constrain(y, this.size / 2, height - this.size / 2);
+      this.activated = false;
     }
   
     display() {
       push();
-      fill(255, 0, 0);
+      if(this.activated)
+      {
+        fill(100);
+      }
+      else{
+        fill(255, 0, 0);
+      }
+      
       noStroke();
       rectMode(CENTER);
       rect(this.x, this.y, this.size, this.size);
@@ -38,7 +46,7 @@ class Bomb {
   
       let numberOfRemovedBalls = oldLength - balls.length;
       updateScore(numberOfRemovedBalls);
-      bombs.splice(bombs.indexOf(this), 1);
+      bomb = null;
     }
   }
   

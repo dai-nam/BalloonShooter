@@ -46,6 +46,10 @@ async globalTimer() {
         spawnNewBomb(random(width), random(height));
         triggerKick();  
         this.updateSpeed();
+        if(bomb && bomb.activated)
+        {
+          bomb.explode();
+        }
       }
     }
   
@@ -88,10 +92,8 @@ async globalTimer() {
     {
        return Math.round(0.5 * (1000.0 / this.speedInMs) * 60.0);
     }
+  
+  }
 
-     beatMapping()
-     {
-      //1:
-      
-     }
-    }
+
+  //Todo: Logik refactoren -> Tick based 16tel Events. Noten-Trigger als 1 im Array mit L#änge 16

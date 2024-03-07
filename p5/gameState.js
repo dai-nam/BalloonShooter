@@ -5,9 +5,9 @@ class GameState{
         this.level = level;
         this.points = 0;
         this.pointsUntilNewLevel = this.level;
-        this.speed = 300;   //ms between beats
+        this.speed = 280;   //ms between beats
         this.updated = false;
-        this.speedLoss = 8;
+        this.speedLoss = 15;
         this.bombProbabilty = 100;
     }
 
@@ -22,6 +22,8 @@ class GameState{
         this.bombProbabilty = 100 - this.level * 5;
         this.bombProbabilty = constrain(this.bombProbabilty, 10, 100);  
         //todo speed und probabl syncen, damit sie proportional zueinande sinken in gleich vielen steps
+        updateSynth();
+        backgroundColor = getRandomColor(true);
         this.updated = true;
     }
 }

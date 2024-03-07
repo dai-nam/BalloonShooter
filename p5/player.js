@@ -76,7 +76,8 @@ class Player {
     
     handleBombCollision(bomb)
     {
-      bomb.explode();
+      bomb.activated = true;
+      //bomb.explode();
     }
   
     flashingColor() {
