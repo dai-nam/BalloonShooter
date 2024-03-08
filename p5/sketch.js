@@ -1,10 +1,11 @@
+//Globals
+var gameState;
+var bomb;
+
 
 //Game Variables
 let audioManager;
 let drums;
-let gameStarted = false;
-let score = 0;
-let gameState;
 let backgroundColor;
 
 //Game Object Variables
@@ -16,7 +17,6 @@ let balls;
 const maxBalls = 32;
 let ballDestroyedAnimations;
 
-var bomb = null;
 let maxBombs = 1;
 let explosionAnimation;
 
@@ -33,22 +33,30 @@ function setup() {
 
   player = new Player();
   balls = [];
-
+  bomb = null;
   ballDestroyedAnimations = [];
 }
 
 function draw() {
   background(backgroundColor);
 
-  if(!gameStarted)
-  {
-    return;
-  }
+  if(!gameState.started) { return; }
 
+  updatePlayer();
+  updateBalls();
+  updateBomb();
+
+  showAnimations();
+  showTextBar();
+}
+
+function updatePlayer() {
   player.updateImmuneStatus();
   player.move();
   player.display();
+}
 
+function updateBalls() {
   for (let ball of balls) {
     ball.move();
     ball.bounce();
@@ -57,28 +65,27 @@ function draw() {
       player.handleBallCollision();
     }
   }
+}
 
-  if(bomb) {
+function updateBomb() {
+  if (bomb) {
     bomb.display();
     if (player.hasCollidedBomb(bomb)) {
       player.handleBombCollision(bomb);
     }
   }
-
-  showAnimations();
-  showTextBar();
 }
 
 function startGame()
 {
   startAudio();
-  drums = new DrumSequener(gameState);
+  drums = new DrumSequener();
   logEverySecond();
-  gameStarted = true;
+  gameState.started = true;
 }
 
 function mousePressed() {
-  if(!gameStarted)
+  if(!gameState.started)
   {
     startGame();
   }
@@ -107,36 +114,15 @@ function spawnNewBomb(x, y) {
 }
 
 
-function updateScore(amount) {
-  score += amount;
-  gameState.points += amount;
-  if(gameState.points >= gameState.pointsUntilNewLevel)
-  {
-    gameState.setNewLevel(gameState.level + 1);
-  }
-}
 
 function showAnimations() {
   if (explosionAnimation != null) {
     explosionAnimation.display();
   }
 
-  for (let anim of ballDestroyedAnimations) {
-    anim.display();
+  for (let ballAnimation of ballDestroyedAnimations) {
+    ballAnimation.display();
   }
-}
-
-function startScreen() {}
-
-function endScreen() {}
-
-function showTextBar() {
-  textSize(20);
-  fill(0);
-  text("Level: " + gameState.level, width - 440, 40);
-  text("Score: " + score, width - 220, 40);
-  text("Balls: " + balls.length, width - 330, 40);
-  text("Health: " + player.health, width - 110, 40);
 }
 
 
@@ -144,18 +130,9 @@ function waitForSeconds(seconds) {
   return new Promise((resolve) => setTimeout(resolve, seconds * 1000));
 }
 
-async function logEverySecond() {
-  while (true) {
-    await waitForSeconds(1.0);
-  }
-}
+
 
 function getRandomColor(alpha)
 {
-  if(!alpha)
-  {
-    return color(random(255), random(255), random(255));
-  }
-    return color(random(255), random(255), random(255), 20);
-
+  return alpha ? color(random(255), random(255), random(255), 20) : color(random(255), random(255), random(255));
 }

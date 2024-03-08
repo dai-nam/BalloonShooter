@@ -1,5 +1,4 @@
 
-
 let context;
 let drumDevice;
 let synthDevice;
@@ -9,25 +8,27 @@ let audioStarted = false;
 let synthFrequency;
 let synthGain;
 
-
 async function loadRnbo( ){
 
-  context = new AudioContext();
+  //Create Audio Context
+  let WAContext = window.AudioContext || window.webkitAudioContext;
+  context = new WAContext();
+  //context = new AudioContext();
   gainNode = context.createGain();
 
   //Drums
-  let drumsPatcher = await fetch("export/drums/drums.export.json");
-  let patcher = await drumsPatcher.json();
-  drumDevice = await RNBO.createDevice({ context, patcher });
+  let response = await fetch("export/drums/drums.export.json");
+  const drumPatcher = await response.json();
+  drumDevice = await RNBO.createDevice({ context, patcher: drumPatcher });
 
   gainNode.connect(drumDevice.node);
   drumDevice.node.connect(context.destination);
 
 
   //Synth
-  let synthPatcher = await fetch("export/synth/synth.export.json");
-  patcher = await synthPatcher.json();
-  synthDevice = await RNBO.createDevice({ context, patcher });
+  response = await fetch("export/synth/synth.export.json");
+  const synthPatcher = await response.json();
+  synthDevice = await RNBO.createDevice({ context, patcher: synthPatcher });
 
   gainNode.connect(synthDevice.node);
   synthDevice.node.connect(context.destination);
@@ -38,7 +39,6 @@ async function loadRnbo( ){
 
   /*
   synthDevice.parameters.forEach(parameter => {
-    console.log(parameter.id);
    console.log(parameter.name);
 });
 */

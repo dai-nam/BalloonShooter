@@ -45,7 +45,7 @@ class Bomb {
       }
   
       let numberOfRemovedBalls = oldLength - balls.length;
-      updateScore(numberOfRemovedBalls);
+      gameState.updateScore(numberOfRemovedBalls);
       bomb = null;
     }
   }

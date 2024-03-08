@@ -53,7 +53,7 @@ class Ball {
     }
   
     destroy() {
-      updateScore(1);
+      gameState.updateScore(1);
       ballDestroyedAnimations.push(
         new BallDestroyedAnimation(this.x, this.y, this.c)
       );

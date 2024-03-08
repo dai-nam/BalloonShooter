@@ -1,6 +1,6 @@
 class DrumSequener{
 
-constructor(level){
+constructor(){
 this.wholeNote = 8;
 this.quarterNote = 4;
 this.eigthNote = 2;
@@ -15,7 +15,6 @@ this.currentMilli = 0;
 this.prevMilli = 0;
 
 this.speedInMs = level.speed;
-this.level = level;
 
 this.globalTimer();
 }

@@ -3,12 +3,14 @@ class GameState{
     constructor(level)
     {
         this.level = level;
+        this.score = 0;
         this.points = 0;
         this.pointsUntilNewLevel = this.level;
         this.speed = 280;   //ms between beats
-        this.updated = false;
         this.speedLoss = 15;
         this.bombProbabilty = 100;
+        this.updated = false;
+        this.started = false;
     }
 
     setNewLevel(level)
@@ -26,4 +28,14 @@ class GameState{
         backgroundColor = getRandomColor(true);
         this.updated = true;
     }
+
+    updateScore(amount) {
+        this.score += amount;
+        this.points += amount;
+        if(this.points >= this.pointsUntilNewLevel)
+        {
+          this.setNewLevel(this.level + 1);
+        }
+      }
+
 }
