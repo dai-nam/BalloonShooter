@@ -28,7 +28,8 @@ function preload() {
 
 function setup() {
   createCanvas(800, 800);
-  backgroundColor = getRandomColor(true);
+  createButtons();
+  backgroundColor = getRandomBackgroundColor();
   gameState = new GameState(1);
 
   player = new Player();
@@ -132,7 +133,26 @@ function waitForSeconds(seconds) {
 
 
 
-function getRandomColor(alpha)
+function getRandomColor()
 {
-  return alpha ? color(random(255), random(255), random(255), 20) : color(random(255), random(255), random(255));
+  let r = random(255);
+  let g = random(255);
+  let b = random(255);
+  return color(r, g, b);
+}
+
+function getRandomBackgroundColor()
+{
+  let r = 0;
+  let g = 0;
+  let b = 0;
+  let a = 20;
+  while((r+g+b <  500))
+  {
+    r = random(255);
+    g = random(255);
+    b = random(255);
+  }
+ 
+  return color(r, g, b, a);
 }

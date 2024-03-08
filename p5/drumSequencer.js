@@ -14,7 +14,7 @@ this.prevEigthNoteCount;
 this.currentMilli = 0;
 this.prevMilli = 0;
 
-this.speedInMs = level.speed;
+this.speedInMs = gameState.speed;
 
 this.globalTimer();
 }

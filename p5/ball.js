@@ -11,7 +11,7 @@ class Ball {
       this.xspeed = random(0.7, 2.4) * this.xDirection;
       this.yspeed = random(0.7, 2.4) * this.yDirection;
   
-      this.c = getRandomColor(false);
+      this.c = getRandomColor();
     }
   
     display() {

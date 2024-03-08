@@ -25,7 +25,7 @@ class GameState{
         this.bombProbabilty = constrain(this.bombProbabilty, 10, 100);  
         //todo speed und probabl syncen, damit sie proportional zueinande sinken in gleich vielen steps
         updateSynth();
-        backgroundColor = getRandomColor(true);
+        backgroundColor = getRandomBackgroundColor();
         this.updated = true;
     }
 

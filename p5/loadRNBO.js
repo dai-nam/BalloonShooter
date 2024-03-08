@@ -10,6 +10,9 @@ let synthGain;
 
 async function loadRnbo( ){
 
+   //Make sure the newest rnbo jsons are loaded by the browser
+  const cacheBuster = new Date().getTime();
+
   //Create Audio Context
   let WAContext = window.AudioContext || window.webkitAudioContext;
   context = new WAContext();
@@ -17,7 +20,7 @@ async function loadRnbo( ){
   gainNode = context.createGain();
 
   //Drums
-  let response = await fetch("export/drums/drums.export.json");
+  response = await fetch(`export/drums/drums.export.json?${cacheBuster}`);
   const drumPatcher = await response.json();
   drumDevice = await RNBO.createDevice({ context, patcher: drumPatcher });
 
@@ -26,7 +29,7 @@ async function loadRnbo( ){
 
 
   //Synth
-  response = await fetch("export/synth/synth.export.json");
+  response = await fetch(`export/synth/synth.export.json?${cacheBuster}`);
   const synthPatcher = await response.json();
   synthDevice = await RNBO.createDevice({ context, patcher: synthPatcher });
 
@@ -37,11 +40,15 @@ async function loadRnbo( ){
   synthGain = synthDevice.parametersById.get("synthgain");
   synthGain.value = 0.25;
 
+  let padgain = synthDevice.parametersById.get("padgain");
+  console.log(padgain.value);
+
   /*
   synthDevice.parameters.forEach(parameter => {
-   console.log(parameter.name);
+  console.log(parameter.name);
 });
 */
+
 
 };
 
