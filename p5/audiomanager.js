@@ -14,7 +14,7 @@ class AudioManager{
           let click = loadSound(`assets/click/click${i}.wav`);
           click.playMode('sustain')
           this.clickSounds.push(click);
-          let burst = loadSound(`assets/burst/chimes${i}.wav`);
+          let burst = loadSound(`assets/burst/chimes${i}.mp3`);
           burst.playMode('sustain');
           this.burstSounds.push(burst);
         }

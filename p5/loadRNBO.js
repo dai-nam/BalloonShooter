@@ -8,6 +8,7 @@ let audioStarted = false;
 let synthFrequency;
 let synthGain;
 
+
 async function loadRnbo( ){
 
    //Make sure the newest rnbo jsons are loaded by the browser
@@ -16,29 +17,26 @@ async function loadRnbo( ){
   //Create Audio Context
   let WAContext = window.AudioContext || window.webkitAudioContext;
   context = new WAContext();
-  //context = new AudioContext();
   gainNode = context.createGain();
+  gainNode.gain.value = 0.7;
+  gainNode.connect(context.destination);
 
   //Drums
   response = await fetch(`export/drums/drums.export.json?${cacheBuster}`);
   const drumPatcher = await response.json();
   drumDevice = await RNBO.createDevice({ context, patcher: drumPatcher });
-
-  gainNode.connect(drumDevice.node);
-  drumDevice.node.connect(context.destination);
-
+  drumDevice.node.connect(gainNode);
 
   //Synth
   response = await fetch(`export/synth/synth.export.json?${cacheBuster}`);
   const synthPatcher = await response.json();
   synthDevice = await RNBO.createDevice({ context, patcher: synthPatcher });
-
-  gainNode.connect(synthDevice.node);
-  synthDevice.node.connect(context.destination);
+  synthDevice.node.connect(gainNode);
+  
   synthFrequency = synthDevice.parametersById.get("synthfrequency");
   synthFrequency.value = 120;
   synthGain = synthDevice.parametersById.get("synthgain");
-  synthGain.value = 0.25;
+  synthGain.value = 0.1;
 
   let padgain = synthDevice.parametersById.get("padgain");
   console.log(padgain.value);
@@ -49,7 +47,10 @@ async function loadRnbo( ){
 });
 */
 
-
+document.addEventListener('tickEvent', triggerKick);
+document.addEventListener('tickEvent', triggerSnare);
+document.addEventListener('tickEvent', triggerHihat);
+document.addEventListener('tickEvent', triggerSynth);
 };
 
 loadRnbo();
@@ -62,28 +63,59 @@ async function startAudio()
 }
 
 
-function triggerKick()
+let kickMap =  [1, 0, 0, 0, 0, 0, 0, 0, 
+                0, 0, 0, 0, 0, 0, 0, 0];
+let snareMap=  [0, 0, 0, 0, 1, 0, 0, 0, 
+                0, 0, 0, 0, 1, 0, 0, 0];
+let hihatMap = [1, 0, 1, 0, 1, 0, 1, 0, 
+                1, 0, 1, 0, 1, 0, 1, 0];
+
+let synthMap = [1, 0, 1, 0, 1, 0, 1, 0, 
+                1, 0, 1, 0, 1, 0, 1, 0];
+
+function triggerKick(ev)
 {
-  const event1 = new RNBO.MessageEvent(RNBO.TimeNow, "in1", RNBO.bang);
-  drumDevice.scheduleEvent(event1);
+  let index = ev.detail;
+  if(kickMap[index] == 1)
+  {
+    const event1 = new RNBO.MessageEvent(RNBO.TimeNow, "in1", RNBO.bang);
+    drumDevice.scheduleEvent(event1);
+  }
 }
 
-function triggerSnare()
+function triggerSnare(ev)
 {
-  const event1 = new RNBO.MessageEvent(RNBO.TimeNow, "in2", RNBO.bang);
-  drumDevice.scheduleEvent(event1);
+  let index = ev.detail;
+  if(snareMap[index] == 1)
+  {
+    const event1 = new RNBO.MessageEvent(RNBO.TimeNow, "in2", RNBO.bang);
+    drumDevice.scheduleEvent(event1);
+  }
 }
 
-function triggerHihat()
+function triggerHihat(ev)
 {
-  const event1 = new RNBO.MessageEvent(RNBO.TimeNow, "in3", RNBO.bang);
-  drumDevice.scheduleEvent(event1);
-  const event2 = new RNBO.MessageEvent(RNBO.TimeNow, "in1", RNBO.bang);
-  synthDevice.scheduleEvent(event2);
+  let index = ev.detail;
+  if(hihatMap[index] == 1)
+  {
+    const event1 = new RNBO.MessageEvent(RNBO.TimeNow, "in3", RNBO.bang);
+    drumDevice.scheduleEvent(event1);
+  }
+}
+
+function triggerSynth(ev)
+{
+  let index = ev.detail;
+  if(synthMap[index] == 1)
+  {
+    const event1 = new RNBO.MessageEvent(RNBO.TimeNow, "in1", RNBO.bang);
+    synthDevice.scheduleEvent(event1);
+  }
 }
 
 function updateSynth()
 {
+  synthFrequency.value = constrain(synthFrequency.value, 50, 370);
   synthFrequency.value *= Math.pow(1.0594633, 1.0/2.0);; //1/2 Semitone higher
 }
   

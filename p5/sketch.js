@@ -146,12 +146,12 @@ function getRandomBackgroundColor()
   let r = 0;
   let g = 0;
   let b = 0;
-  let a = 20;
+  let a = 10;
   while((r+g+b <  500))
   {
-    r = random(255);
-    g = random(255);
-    b = random(255);
+    r = random(100, 255);
+    g = random(100, 255);
+    b = random(100, 255);
   }
  
   return color(r, g, b, a);
