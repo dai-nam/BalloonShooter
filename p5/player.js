@@ -11,19 +11,20 @@ class Player {
       this.flashTimer = 0;
       this.flashSpeed = 0.1;
       this.toggleFlash = false;
+      this.col;
+      this.ballCollision = new CustomEvent("ballCollision");
     }
   
     display() {
-      var col;
       if (this.isImmune) {
         this.flashingColor();
-        col = this.toggleFlash ? 220 : 150;
+        this.col = this.toggleFlash ? 220 : 150;
       } else {
-        col = this.c;
+        this.col = this.c;
       }
   
       push();
-      fill(col);
+      fill(this.col);
       noStroke();
       rectMode(CENTER);
       rect(this.x, this.y, this.size, this.size);
@@ -59,8 +60,9 @@ class Player {
       var d = dist(player.x, player.y, ball.x, ball.y);
       return d < ball.rad;
     }
-  
+
     handleBallCollision() {
+      document.dispatchEvent(this.ballCollision);
       this.health--;
       timeSinceLastHit = 0;
       // console.log(this.health);
