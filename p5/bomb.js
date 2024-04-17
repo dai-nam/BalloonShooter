@@ -23,6 +23,8 @@ class Bomb {
     }
   
     explode() {
+
+      audioManager.playSound(audioManager.bombSound);
       new ExplosionAnimation(this.x, this.y);
       if (balls.length == 0) return;
   

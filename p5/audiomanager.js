@@ -4,6 +4,8 @@ class AudioManager{
       this.clickSounds = [];
       this.burstSounds = [];
       this.damageSound;
+      this.bombSound;
+
       this.loadSounds();
       //Arrow-Syntx nötig, damit this sich auf den AudioManager bezieht und nicht das Event-Objekt
       document.addEventListener("ballCollision", () => this.playDamageSound());    
@@ -22,6 +24,7 @@ class AudioManager{
           this.burstSounds.push(burst);
         }
       
+      this.bombSound = loadSound(`assets/bomb.mp3`);
       this.damageSound = loadSound(`assets/player/damage.mp3`);
       console.log("Sounds loaded"); 
     }

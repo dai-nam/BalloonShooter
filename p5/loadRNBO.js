@@ -7,9 +7,14 @@ let gainNode;
 let audioStarted = false;
 let synthFrequency;
 let synthGain;
+let synthRelease;
+let detuneVoice1;
+let detuneVoice2;
 
 
 async function loadRnbo( ){
+
+
 
    //Make sure the newest rnbo jsons are loaded by the browser
   const cacheBuster = new Date().getTime();
@@ -32,20 +37,32 @@ async function loadRnbo( ){
   const synthPatcher = await response.json();
   synthDevice = await RNBO.createDevice({ context, patcher: synthPatcher });
   synthDevice.node.connect(gainNode);
+
+  synthDevice.parameters.forEach(parameter => {
+    console.log(parameter.name);
+  });
   
   synthFrequency = synthDevice.parametersById.get("synthfrequency");
   synthFrequency.value = 120;
+
+  synthRelease = synthDevice.parametersById.get("synthRelease");
+  synthRelease.value = 70;
+
   synthGain = synthDevice.parametersById.get("synthgain");
   synthGain.value = 0.1;
 
   let padgain = synthDevice.parametersById.get("padgain");
+  padgain.value = 0.07;
   console.log(padgain.value);
 
-  /*
-  synthDevice.parameters.forEach(parameter => {
-  console.log(parameter.name);
-});
-*/
+  
+  detuneVoice1 = synthDevice.parametersById.get("randomRatio/detuneVoice1");
+  detuneVoice1.value = 0.0;
+  print(detuneVoice1.min);
+  detuneVoice2 = synthDevice.parametersById.get("randomRatio/detuneVoice2");
+  detuneVoice2.value = 0.0;
+
+
 
 document.addEventListener('tickEvent', triggerKick);
 document.addEventListener('tickEvent', triggerSnare);
@@ -108,6 +125,7 @@ function triggerSynth(ev)
   let index = ev.detail;
   if(synthMap[index] == 1)
   {
+    calculateDetune();
     const event1 = new RNBO.MessageEvent(RNBO.TimeNow, "in1", RNBO.bang);
     synthDevice.scheduleEvent(event1);
   }
@@ -118,6 +136,14 @@ function updateSynth()
   synthFrequency.value = constrain(synthFrequency.value, 50, 370);
   synthFrequency.value *= Math.pow(1.0594633, 1.0/2.0);; //1/2 Semitone higher
 }
+
+function calculateDetune()
+{
+  let maxDetune = 1.3;
+  detuneVoice1.value = map(balls.length, 0, maxBalls, detuneVoice1.min, maxDetune);
+ // detuneVoice2.value = map(balls.length, 0, maxBalls, detuneVoice2.min, maxDetune);
+}
+
   
 
 
